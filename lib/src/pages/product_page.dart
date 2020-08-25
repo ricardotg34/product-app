@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:formvalidation/src/models/Product.dart';
 import 'package:formvalidation/src/utils/utils.dart' as utils;
 
 class ProductPage extends StatefulWidget {
@@ -8,6 +9,7 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   final formKey = GlobalKey<FormState>();
+  ProductModel product = new ProductModel();
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class _ProductPageState extends State<ProductPage> {
             child: Column(
               children: [
                 TextFormField( //Product field
+                  initialValue: product.title,
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
                     labelText: 'Producto'
@@ -43,8 +46,10 @@ class _ProductPageState extends State<ProductPage> {
                     else
                       return null;
                   },
+                  onSaved: (value)=> product.title = value,
                 ),
                 TextFormField( //Price field
+                  initialValue: product.value.toString(),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
                     labelText: 'Precio'
@@ -55,6 +60,14 @@ class _ProductPageState extends State<ProductPage> {
                     else
                       return null;
                   },
+                  onSaved: (value)=> product.value = double.parse(value)
+                ),
+                SwitchListTile(
+                  value: product.available,
+                  onChanged: (value) => setState(() {
+                    product.available = value;
+                  }),
+                  title: Text('Disponible'),
                 ),
                 RaisedButton.icon( //Save Button
                   onPressed: _submit,
@@ -75,6 +88,7 @@ class _ProductPageState extends State<ProductPage> {
   void _submit(){
     if(formKey.currentState.validate()){
       //Cuando el form es válido
+      formKey.currentState.save();
       print('Todo ok');
     }else{
       return;

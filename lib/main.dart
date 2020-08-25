@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
           primaryColor: Color.fromRGBO(100, 42, 63, 1.0),
           accentColor: Color.fromRGBO(158, 60, 96, 1.0),
           buttonColor: Color.fromRGBO(100, 42, 63, 1.0),
+          toggleableActiveColor: Color.fromRGBO(158, 60, 96, 1.0),
           textTheme: TextTheme(
             button: TextStyle(color: Colors.white)
           ),
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
           accentColor: Color.fromRGBO(158, 60, 96, 1.0),
           buttonColor: Color.fromRGBO(100, 42, 63, 1.0),
+          toggleableActiveColor: Color.fromRGBO(158, 60, 96, 1.0),
         ),
         themeMode: ThemeMode.dark,
         routes: {
