@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:formvalidation/src/models/Product.dart';
+import 'package:formvalidation/src/providers/product_provider.dart';
 import 'package:formvalidation/src/utils/utils.dart' as utils;
 
 class ProductPage extends StatefulWidget {
@@ -9,11 +10,21 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   final formKey = GlobalKey<FormState>();
-  ProductModel product = new ProductModel();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  ProductModel product;
+  final ProductProvider _productProvider = new ProductProvider();
+  bool _isSaving = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    product = ModalRoute.of(context).settings.arguments ?? new ProductModel();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text('Producto'),
         actions: [
@@ -35,7 +46,7 @@ class _ProductPageState extends State<ProductPage> {
             child: Column(
               children: [
                 TextFormField( //Product field
-                  initialValue: product.title,
+                  initialValue: product.name,
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
                     labelText: 'Producto'
@@ -46,10 +57,10 @@ class _ProductPageState extends State<ProductPage> {
                     else
                       return null;
                   },
-                  onSaved: (value)=> product.title = value,
+                  onSaved: (value)=> product.name = value,
                 ),
                 TextFormField( //Price field
-                  initialValue: product.value.toString(),
+                  initialValue: product.price.toString(),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
                     labelText: 'Precio'
@@ -60,7 +71,7 @@ class _ProductPageState extends State<ProductPage> {
                     else
                       return null;
                   },
-                  onSaved: (value)=> product.value = double.parse(value)
+                  onSaved: (value)=> product.price = double.parse(value)
                 ),
                 SwitchListTile(
                   value: product.available,
@@ -70,7 +81,7 @@ class _ProductPageState extends State<ProductPage> {
                   title: Text('Disponible'),
                 ),
                 RaisedButton.icon( //Save Button
-                  onPressed: _submit,
+                  onPressed: _isSaving ? null : _submit,
                   icon: Icon(Icons.save),
                   label: Text('Guardar'),
                   shape: RoundedRectangleBorder(
@@ -85,13 +96,38 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  void _submit(){
+  void _submit() async{
+    bool isOk;
+    String mensaje;
     if(formKey.currentState.validate()){
       //Cuando el form es válido
       formKey.currentState.save();
-      print('Todo ok');
+      setState(() {
+        _isSaving = true;
+      });
+      if(product.id != null){
+        isOk = await _productProvider.updateProduct(product.id, product);
+        mensaje = isOk ? 'El producto se actualizó correctamente' : 'Hubo un problema al actualizar el producto';
+
+      }else {
+        isOk = await _productProvider.createProdcut(product);
+        mensaje = isOk ? 'El producto se creó correctamente' : 'Hubo un problema al crear el producto';
+      }
+      setState(() {
+        _isSaving = false;
+      });
+      showSnackbar(mensaje);
     }else{
       return;
     }
+  }
+
+  void showSnackbar(String mensaje){
+    final snackbar = SnackBar(
+      content: Text(mensaje),
+      duration: Duration(milliseconds: 2000),
+    );
+
+    scaffoldKey.currentState.showSnackBar(snackbar);
   }
 }
