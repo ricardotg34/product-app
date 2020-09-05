@@ -21,7 +21,16 @@ class _HomePageState extends State<HomePage> {
             return ListView.builder(
               itemCount: snapshot.data.length,
               itemBuilder: (context, index) => ProductTile(
-                product: snapshot.data[index]
+                product: snapshot.data[index],
+                onDismissed: (direction){
+                  setState(() {
+                  });
+                },
+                onReturn: (){
+                  Navigator.pushNamed(context, 'product', arguments: snapshot.data[index]).then((value){
+                    setState((){});
+                  });
+                }
               )
             );
           return Center(child: CircularProgressIndicator());

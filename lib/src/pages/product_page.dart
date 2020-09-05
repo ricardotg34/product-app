@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:formvalidation/src/models/Product.dart';
 import 'package:formvalidation/src/providers/product_provider.dart';
 import 'package:formvalidation/src/utils/utils.dart' as utils;
+import 'package:image_picker/image_picker.dart';
 
 class ProductPage extends StatefulWidget {
   @override
@@ -14,6 +17,7 @@ class _ProductPageState extends State<ProductPage> {
   ProductModel product;
   final ProductProvider _productProvider = new ProductProvider();
   bool _isSaving = false;
+  File photo;
 
   @override
   void didChangeDependencies() {
@@ -30,11 +34,11 @@ class _ProductPageState extends State<ProductPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.photo_size_select_actual),
-            onPressed: (){}
+            onPressed:() => _selectPhoto(ImageSource.gallery)
           ),
           IconButton(
             icon: Icon(Icons.camera_alt),
-            onPressed: (){}
+            onPressed: () => _selectPhoto(ImageSource.camera)
           ),
         ],
       ),
@@ -45,6 +49,7 @@ class _ProductPageState extends State<ProductPage> {
             key: formKey,
             child: Column(
               children: [
+                _productImage(),
                 TextFormField( //Product field
                   initialValue: product.name,
                   textCapitalization: TextCapitalization.sentences,
@@ -96,6 +101,23 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
+  Widget _productImage(){
+    if( product.imagePath != null){
+      return FadeInImage(
+        placeholder: AssetImage('assets/jar-loading.gif'),
+        image: NetworkImage('http://192.168.0.9:3000/products/images/${product.imagePath}'),
+        fit: BoxFit.cover,
+        height: 300,
+      );
+    } else {
+      return Image(
+        image: AssetImage(photo?.path ?? 'assets/no-image.png'),
+        height: 300,
+        fit: BoxFit.cover
+      );
+    }
+  }
+
   void _submit() async{
     bool isOk;
     String mensaje;
@@ -108,11 +130,19 @@ class _ProductPageState extends State<ProductPage> {
       if(product.id != null){
         isOk = await _productProvider.updateProduct(product.id, product);
         mensaje = isOk ? 'El producto se actualizó correctamente' : 'Hubo un problema al actualizar el producto';
-
+        if(photo != null) _productProvider.uploadImage(photo, product.id);
       }else {
-        isOk = await _productProvider.createProdcut(product);
-        mensaje = isOk ? 'El producto se creó correctamente' : 'Hubo un problema al crear el producto';
+        final response = await _productProvider.createProdcut(product);
+        mensaje = response['isOk'] ? 'El producto se creó correctamente' : 'Hubo un problema al crear el producto';
+        if(photo != null) _productProvider.uploadImage(photo, response['product'].id);
+        setState(() {
+          photo = null;
+          product.available = true;
+          product.name = '';
+          product.price = 0.0;
+        });
       }
+
       setState(() {
         _isSaving = false;
       });
@@ -129,5 +159,16 @@ class _ProductPageState extends State<ProductPage> {
     );
 
     scaffoldKey.currentState.showSnackBar(snackbar);
+  }
+
+  void _selectPhoto(ImageSource origin) async{
+    final picker = ImagePicker();
+    final pickedFile = await picker.getImage(source: origin);
+    photo = File(pickedFile.path);
+    print(photo.path);
+    if (photo != null) {
+      product.imagePath = null;
+    }
+    setState(() {});
   }
 }

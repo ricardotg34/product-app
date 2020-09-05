@@ -10,14 +10,14 @@ class ProductModel {
     String name;
     double price;
     bool available;
-    String urlPicture;
+    String imagePath;
 
     ProductModel({
         this.id,
         this.name = '',
         this.price  = 0.0,
         this.available = true,
-        this.urlPicture,
+        this.imagePath,
     });
 
     factory ProductModel.fromJson(Map<String, dynamic> json) => new ProductModel(
@@ -25,7 +25,7 @@ class ProductModel {
         name     : json["name"],
         price      : json["price"].toDouble(),
         available : json["available"],
-        urlPicture    : json["url_picture"],
+        imagePath    : json["imagePath"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -33,6 +33,6 @@ class ProductModel {
         "name"     : name,
         "price"      : price,
         "available" : available,
-        "url_picture"    : urlPicture,
+        "imagePath"    : imagePath,
     };
 }

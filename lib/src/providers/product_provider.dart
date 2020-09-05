@@ -1,23 +1,25 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:async/async.dart' as asyn;
 
 import 'package:formvalidation/src/models/Product.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 
 class ProductProvider {
   final String _url = '192.168.0.9:3000';
 
-  Future<bool> createProdcut(ProductModel product) async{
+  Future<Map<String, dynamic>> createProdcut(ProductModel product) async{
     final url = Uri.http(_url, '/products');
-    final body = jsonEncode({
-      "name": product.name,
-      "price": product.price,
-      "available": product.available
-    });
     final headers = {
       "Content-Type": "application/json"
     };
     final res = await http.post(url, headers: headers, body: productoModelToJson(product));
-    return res.statusCode == 201;
+    final resData = json.decode(res.body);
+    return {
+      "isOk": res.statusCode == 201,
+      "product": ProductModel.fromJson(resData)
+    };
   }
 
   Future<List<ProductModel>> loadProducts() async {
@@ -45,5 +47,23 @@ class ProductProvider {
     final url = Uri.http(_url, '/products/$id');
     final res = await http.delete(url);
     return res.statusCode == 204;
+  }
+
+  Future<String> uploadImage(File imageFile, String id) async {
+    //Saves content image in a byte stream
+    var stream = new http.ByteStream(asyn.DelegatingStream(imageFile.openRead()));
+    var length = await imageFile.length();
+    final url = Uri.http(_url,'/products/setImage/$id');
+    final Object headers = {
+      "Accept": "application/json"
+    };
+    var request = new http.MultipartRequest("POST", url);
+    var multipartFile = new http.MultipartFile('file', stream, length,filename: path.basename(imageFile.path));
+    request.files.add(multipartFile);
+    request.headers.addAll(headers);
+    var response = await request.send().timeout(Duration(seconds: 10));
+    var value = await response.stream.bytesToString();
+    print(value);
+    return null;
   }
 }
