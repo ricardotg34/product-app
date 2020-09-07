@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:formvalidation/src/blocs/login_bloc.dart';
 import 'package:formvalidation/src/blocs/provider.dart';
 import 'package:formvalidation/src/providers/user_provider.dart';
-import 'package:formvalidation/src/utils/user_preferences.dart';
 
-class LoginPage extends StatelessWidget {
-  final _prefs = new UserPreferences();
+class RegisterPage extends StatelessWidget {
   final _userProvider = UserProvider();
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -91,7 +89,7 @@ class LoginPage extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Text('Ingreso', style: TextStyle(fontSize: 20)),
+                Text('Crear cuenta', style: TextStyle(fontSize: 20)),
                 _emailField(bloc),
                 _passwordField(bloc),
                 SizedBox(height: 20,),
@@ -99,7 +97,7 @@ class LoginPage extends StatelessWidget {
               ],
             ),
           ),
-          FlatButton(child: Text('Crear una nueva cuenta.'), onPressed: ()=> Navigator.pushReplacementNamed(context, 'register'))
+          FlatButton(child: Text('¿Ya tienes cuenta?'), onPressed: ()=> Navigator.pushReplacementNamed(context, 'login'))
         ],
       ),
     );
@@ -151,7 +149,7 @@ class LoginPage extends StatelessWidget {
       builder: (context, snapshot) {
         return ListTile(
           title: RaisedButton(
-            onPressed: snapshot.hasData ? ()=> _login(bloc, context) : null,
+            onPressed: snapshot.hasData ? ()=> _register(bloc, context) : null,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5)
             ),
@@ -166,15 +164,14 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  _login(LoginBloc bloc, BuildContext context) async {
-    final response = await _userProvider.login(bloc.email, bloc.password);
+  _register(LoginBloc bloc, BuildContext context) async {
+    final res = await _userProvider.newUser(bloc.email, bloc.password);
     print('Email: ${bloc.email}');
     print('Password: ${bloc.password}');
-    if(response.success){
-      _prefs.token = response.body['accessToken'];
-      Navigator.of(context).pushReplacementNamed('home');
+    if(res.success){
+      Navigator.of(context).pushReplacementNamed('login');
     } else {
-      showSnackbar('Usuario o contraseña incorecto.');
+      showSnackbar('No se pudo guardar el usuario');
     }
   }
 

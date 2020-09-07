@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:formvalidation/src/blocs/provider.dart';
 import 'package:formvalidation/src/pages/home_page.dart';
 import 'package:formvalidation/src/pages/login_page.dart';
 import 'package:formvalidation/src/pages/product_page.dart';
+import 'package:formvalidation/src/pages/register_page.dart';
+import 'package:formvalidation/src/utils/user_preferences.dart';
 
-void main() => runApp(MyApp());
+Future<void> main() async{
+  final prefs = new UserPreferences();
+  await prefs.initPrefs();
+  await DotEnv().load('.env');
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -13,7 +22,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Material App',
         debugShowCheckedModeBanner: false,
-        initialRoute: 'home',
+        initialRoute: 'login',
         theme: ThemeData(
           brightness: Brightness.light,
           primaryColor: Color.fromRGBO(100, 42, 63, 1.0),
@@ -33,6 +42,7 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.dark,
         routes: {
           'login': (BuildContext context) => LoginPage(),
+          'register': (BuildContext context) => RegisterPage(),
           'home': (BuildContext context) => HomePage(),
           'product': (BuildContext context) => ProductPage()
         }
