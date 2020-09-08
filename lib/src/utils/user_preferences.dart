@@ -17,7 +17,7 @@ class UserPreferences {
   }
 
   // GET y SET del nombre
-  get token {
+  String get token {
     return _prefs.getString('token') ?? '';
   }
 

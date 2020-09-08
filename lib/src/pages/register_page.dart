@@ -166,12 +166,10 @@ class RegisterPage extends StatelessWidget {
 
   _register(LoginBloc bloc, BuildContext context) async {
     final res = await _userProvider.newUser(bloc.email, bloc.password);
-    print('Email: ${bloc.email}');
-    print('Password: ${bloc.password}');
     if(res.success){
       Navigator.of(context).pushReplacementNamed('login');
     } else {
-      showSnackbar('No se pudo guardar el usuario');
+      showSnackbar(res.body['message'].join('\n'));
     }
   }
 

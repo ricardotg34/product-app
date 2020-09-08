@@ -9,6 +9,7 @@ import 'package:formvalidation/src/pages/register_page.dart';
 import 'package:formvalidation/src/utils/user_preferences.dart';
 
 Future<void> main() async{
+  WidgetsFlutterBinding.ensureInitialized();
   final prefs = new UserPreferences();
   await prefs.initPrefs();
   await DotEnv().load('.env');
@@ -16,6 +17,7 @@ Future<void> main() async{
 }
 
 class MyApp extends StatelessWidget {
+  final prefs = new UserPreferences();
   @override
   Widget build(BuildContext context) {
     return Provider(

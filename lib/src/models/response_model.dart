@@ -16,9 +16,14 @@ class ResponseModel {
   });
 
   ResponseModel.fromResponse(Response res){
-    body = json.decode(res.body);
-    message = res.reasonPhrase;
-    statusCode = res.statusCode;
-    success = res.statusCode >= 200 && res.statusCode <= 210;
+    try {
+      body = json.decode(res.body);
+    } catch(error) {
+      body = const {};
+    } finally {
+      message = res.reasonPhrase;
+      statusCode = res.statusCode;
+      success = res.statusCode >= 200 && res.statusCode <= 210;
+    }
   }
 }

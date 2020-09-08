@@ -7,7 +7,7 @@ class UserProvider {
   Future<ResponseModel> newUser(String email, String password) async{
     final url = Uri.http(dotenv.env['API_URL'], '${dotenv.env['AUTH_ENDPOINT']}signUp');
     final body = {
-      "username": email,
+      "email": email,
       "password": password
     };
     final res = await http.post(url, body: body);
@@ -17,7 +17,7 @@ class UserProvider {
   Future<ResponseModel> login(String email, String password) async{
     final url = Uri.http(dotenv.env['API_URL'], '${dotenv.env['AUTH_ENDPOINT']}signIn');
     final body = {
-      "username": email,
+      "email": email,
       "password": password
     };
     final res = await http.post(url, body: body);
