@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:formvalidation/src/blocs/login_bloc.dart';
+import 'package:formvalidation/src/blocs/products_bloc.dart';
 
 class Provider extends InheritedWidget{
   final loginBloc = LoginBloc();
+  final producsBloc = ProductsBloc();
 
 
   static Provider _instancia;
@@ -17,11 +19,13 @@ class Provider extends InheritedWidget{
     : super(key: key, child: child);
 
   @override
-  bool updateShouldNotify(InheritedWidget oldWidget) {
-    throw UnimplementedError();
-  }
+  bool updateShouldNotify(InheritedWidget oldWidget) => true;
 
   static LoginBloc ofLogin(BuildContext context){
     return context.dependOnInheritedWidgetOfExactType<Provider>().loginBloc;
+  }
+
+    static ProductsBloc ofProducts(BuildContext context){
+    return context.dependOnInheritedWidgetOfExactType<Provider>().producsBloc;
   }
 }

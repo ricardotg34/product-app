@@ -168,8 +168,6 @@ class LoginPage extends StatelessWidget {
 
   _login(LoginBloc bloc, BuildContext context) async {
     final response = await _userProvider.login(bloc.email, bloc.password);
-    print('Email: ${bloc.email}');
-    print('Password: ${bloc.password}');
     if(response.success){
       _prefs.token = response.body['accessToken'];
       Navigator.of(context).pushReplacementNamed('home');

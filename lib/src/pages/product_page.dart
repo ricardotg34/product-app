@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:formvalidation/src/blocs/products_bloc.dart';
+import 'package:formvalidation/src/blocs/provider.dart';
 import 'package:formvalidation/src/models/Product.dart';
-import 'package:formvalidation/src/providers/product_provider.dart';
 import 'package:formvalidation/src/utils/utils.dart' as utils;
 import 'package:image_picker/image_picker.dart';
 
@@ -12,10 +13,10 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
+  ProductsBloc _productsBloc;
   final formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
   ProductModel product;
-  final ProductProvider _productProvider = new ProductProvider();
   bool _isSaving = false;
   File photo;
 
@@ -23,6 +24,7 @@ class _ProductPageState extends State<ProductPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     product = ModalRoute.of(context).settings.arguments ?? new ProductModel();
+    _productsBloc = Provider.ofProducts(context);
   }
 
   @override
@@ -128,13 +130,13 @@ class _ProductPageState extends State<ProductPage> {
         _isSaving = true;
       });
       if(product.id != null){
-        isOk = await _productProvider.updateProduct(product.id, product);
+        isOk = await _productsBloc.updateProduct(product.id, product);
         mensaje = isOk ? 'El producto se actualizó correctamente' : 'Hubo un problema al actualizar el producto';
-        if(photo != null) _productProvider.uploadImage(photo, product.id);
+        if(photo != null) _productsBloc.uploadImage(photo, product.id);
       }else {
-        final response = await _productProvider.createProdcut(product);
+        final response = await _productsBloc.createProduct(product);
         mensaje = response['isOk'] ? 'El producto se creó correctamente' : 'Hubo un problema al crear el producto';
-        if(photo != null) _productProvider.uploadImage(photo, response['product'].id);
+        if(photo != null) _productsBloc.uploadImage(photo, response['product'].id);
         setState(() {
           photo = null;
           product.available = true;

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:formvalidation/src/blocs/products_bloc.dart';
+import 'package:formvalidation/src/blocs/provider.dart';
 import 'package:formvalidation/src/models/Product.dart';
-import 'package:formvalidation/src/providers/product_provider.dart';
 
 class ProductTile extends StatelessWidget {
-  final _provider = ProductProvider();
   final ProductModel product;
   final void Function(DismissDirection) onDismissed;
   final void Function() onReturn;
   ProductTile({this.product, this.onDismissed, this.onReturn});
   @override
   Widget build(BuildContext context) {
+    ProductsBloc _productsBloc = Provider.ofProducts(context);
     return Dismissible(
       onDismissed: onDismissed,
       key: UniqueKey(),
       confirmDismiss: (direction) async{
-        return await _provider.deleteProduct(product.id);
+        return await _productsBloc.deleteProduct(product.id);
       },
       background: Container(
         color: Colors.red
